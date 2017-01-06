@@ -320,7 +320,7 @@ void GDClass::begin(uint8_t options) {
 
 // configuration based on info in thread:
 // http://gameduino2.proboards.com/thread/270/gameduino-3
-// works for http://www.buydisplay.com/default/7-inch-lcd-screen-tft-display-module-wvga-800x480-at070tn90-at070tn92
+// works for http://www.buydisplay.com/default/7-tft-lcd-touch-screen-display-module-800x480-for-mp4-gps-tablet-pc
 #if (BOARD == BOARD_VM810C)
   GD.wr32(REG_HCYCLE, 900);//548
   GD.wr32(REG_HOFFSET, 43);
