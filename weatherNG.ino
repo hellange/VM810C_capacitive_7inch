@@ -1,33 +1,22 @@
+/************************************************
+ *  Next generation weather station base
+ *  
+ *  FT81x graphics driver is copied from jamesbowman / gd2-lib
+ *  (https://github.com/jamesbowman/gd2-lib.git)
+ *  
+ *  
+ ************************************************/
+
 #include <EEPROM.h>
 #include <SPI.h>
-
 #include "GD2.h"
 
 void setup()
 {
-
-  Serial.begin(9600); // JCB
-  Serial.println("Hello2");
-
+  Serial.begin(9600);
+  Serial.println("Initializing WeatherNG graphics controller FT810...");
   GD.begin(0);
-  GD.wr32(REG_HCYCLE, 900);//548
-  GD.wr32(REG_HOFFSET, 43);
-  GD.wr32(REG_HSIZE, 800);
-  GD.wr32(REG_HSYNC0, 0);
-  GD.wr32(REG_HSYNC1, 41);
-  GD.wr32(REG_VCYCLE, 500);
-  GD.wr32(REG_VOFFSET, 12);
-  GD.wr32(REG_VSIZE, 480);
-  GD.wr32(REG_VSYNC0, 0);
-  GD.wr32(REG_VSYNC1, 10);
-  GD.wr32(REG_DITHER, 1);
-  GD.wr32(REG_PCLK_POL, 1);//1
-  GD.wr32(REG_PCLK, 3);//5
-  GD.wr(REG_ROTATE, 0);
-  GD.wr(REG_SWIZZLE, 0);//3 for GD2
-
-  Serial.println("Hello2");
-
+  Serial.println("Initialized.");
 }
 
 void loop()
@@ -36,9 +25,16 @@ void loop()
 
   GD.Clear();
 
-  GD.cmd_text(GD.w, GD.h, 31, OPT_CENTER, "Hello world");
-  GD.cmd_text(GD.w / 2, GD.h / 2, 31, OPT_CENTER, "Hello world");
- 
+  // X centered at upper left corner
+  GD.cmd_text(0, 0 , 31, OPT_CENTER, "X");
+
+  // Text centered on screen
+  GD.cmd_text(GD.w / 2, GD.h / 2, 31, OPT_CENTER, "WeatherNG");
+  GD.cmd_text(GD.w / 2, GD.h / 2 + 30 , 28, OPT_CENTER, "Hello, world !");
+
+  // X centered at lower right corner
+  GD.cmd_text(GD.w, GD.h, 31, OPT_CENTER, "X");
+
 
   GD.swap();
 }

@@ -11,8 +11,9 @@
 #define BOARD_FTDI_80x    0
 #define BOARD_GAMEDUINO23 1
 #define BOARD_EVITA_0     2
+#define BOARD_VM810C      3
 
-#define BOARD         BOARD_FTDI_80x // board, from above
+#define BOARD         BOARD_VM810C 
 #define STORAGE       0                 // Want SD storage?
 #define CALIBRATION   0                 // Want touchscreen?
 
@@ -317,6 +318,28 @@ void GDClass::begin(uint8_t options) {
   }
 #endif
 
+// configuration based on info in thread:
+// http://gameduino2.proboards.com/thread/270/gameduino-3
+// works for http://www.buydisplay.com/default/7-inch-lcd-screen-tft-display-module-wvga-800x480-at070tn90-at070tn92
+#if (BOARD == BOARD_VM810C)
+  GD.wr32(REG_HCYCLE, 900);//548
+  GD.wr32(REG_HOFFSET, 43);
+  GD.wr32(REG_HSIZE, 800);
+  GD.wr32(REG_HSYNC0, 0);
+  GD.wr32(REG_HSYNC1, 41);
+  GD.wr32(REG_VCYCLE, 500);
+  GD.wr32(REG_VOFFSET, 12);
+  GD.wr32(REG_VSIZE, 480);
+  GD.wr32(REG_VSYNC0, 0);
+  GD.wr32(REG_VSYNC1, 10);
+  GD.wr32(REG_DITHER, 1);
+  GD.wr32(REG_PCLK_POL, 1);//1
+  GD.wr32(REG_PCLK, 3);//5
+  GD.wr(REG_ROTATE, 0);
+  GD.wr(REG_SWIZZLE, 0);//3 for GD2
+#endif
+
+
   if (0) {
     GDTR.wr16(REG_HCYCLE, 928);
     GDTR.wr16(REG_HOFFSET, 88);
@@ -356,6 +379,11 @@ void GDClass::begin(uint8_t options) {
   w = GDTR.rd16(REG_HSIZE);
   h = GDTR.rd16(REG_VSIZE);
   // w = 480, h = 272;
+  Serial.println("Width:");
+  Serial.println(w);
+  Serial.println("Height");
+  Serial.println(h);
+
   Clear(); swap();
   Clear(); swap();
   Clear(); swap();
