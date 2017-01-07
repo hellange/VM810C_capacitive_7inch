@@ -4,7 +4,20 @@
  *  FT81x graphics driver is copied from jamesbowman / gd2-lib
  *  (https://github.com/jamesbowman/gd2-lib.git)
  *  
- *  
+ *  Connections:
+
+ VM810C          UNO
+
+ SCK             13
+ MOSI            11          
+ MISO            12
+ CS               8 
+ 5V              5V
+ GND            GND
+
+ FT5316
+ (not included yet)
+ 
  ************************************************/
 
 #include <EEPROM.h>
