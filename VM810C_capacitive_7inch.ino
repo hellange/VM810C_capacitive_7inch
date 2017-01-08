@@ -36,6 +36,7 @@
 #include "GD2.h"
 #include "Wire.h"
 #include "FT5xx6.h"
+#include "walk_assets.h"
 
 #define CTP_INT           2    // touch data ready for read from touch panel
 FT5xx6 cmt = FT5xx6(CTP_INT);
@@ -66,6 +67,7 @@ void printRawRegisterValuesToSerial(byte *registers) {
     }
     Serial.println("");
 }
+
 void setup()
 {
   Serial.begin(9600);
@@ -73,8 +75,8 @@ void setup()
   cmt.init(true);
   Serial.println("Initializing WeatherNG graphics controller FT810...");
   GD.begin(0);
+  LOAD_ASSETS();
   Serial.println("Done.");
-
 }
 
 byte nr_of_touches = 0;
@@ -97,8 +99,6 @@ void drawMainText() {
 }
 
 
-
-  
 void drawCircle(word x, word y, word pixels) {
   GD.PointSize(16 * pixels);
   GD.Begin(POINTS);
@@ -106,9 +106,34 @@ void drawCircle(word x, word y, word pixels) {
   GD.Vertex2f(x * 16, y * 16);
 }
 
+void drawSprite(int16_t x, int16_t y, byte handle, byte cell) {
+  // In order to draw bitmap on x coordinates higher that 512
+  // we use VertexTranslateX which according to documentation:
+  // "Specifies the offset added to vertex X coordinates. 
+  //  This command allows drawing to be shifted on the screen"
+  // Not sure if this is the right approach, but it seems to work
+  GD.Begin(BITMAPS);
+  if (x < 0) {
+    // For negative x we shift instead of setting x
+    GD.VertexTranslateX(x * 16 );
+    x = 0; 
+  } else if (x > 511) {
+    // for high values we start to use shift
+    // and reduces the x value accordingly
+    GD.VertexTranslateX(511 * 16);
+    x = x - 511;
+  }
+  GD.Vertex2ii(x, y, handle, cell);
+  GD.RestoreContext();
+}
+
 void loop()
 {
     drawMainText();
+    drawSprite(0, 220, WALK_HANDLE, 0); // extreme left
+    drawSprite(800 - 30, 220, WALK_HANDLE, 0); // extreme right
+    drawSprite(400, 0, WALK_HANDLE, 0); // extreme top
+    drawSprite(400, 480 - 30, WALK_HANDLE, 0); // extreme bottom
 
     if (cmt.touched()){
       serialDebugOutput(nr_of_touches, coordinates);
@@ -118,7 +143,7 @@ void loop()
       for (byte i = 0; i < nr_of_touches; i++){
         word x = coordinates[i * 2];
         word y = coordinates[i * 2 + 1];
-        GD.ColorA(128); // 50% transparent
+        GD.ColorA(128); // transparent
         GD.ColorRGB(0xff0000); // red
         drawCircle(x, y, 30);
         GD.ColorRGB(0xff8000); // orange
